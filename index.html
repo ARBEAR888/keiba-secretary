@@ -2,626 +2,219 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <!-- iPhone最適化メタタグ -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="競馬秘書">
     <meta name="theme-color" content="#080c18">
-    <title>敏腕女性秘書 - iPhone対応 競馬投資システム</title>
+    <title>敏腕女性秘書 - 実データ取得対応版</title>
     <style>
-        /* ========== CSS変数 ========== */
         :root {
-            --bg-dark: #080c18;
-            --bg-panel: #101420;
-            --bg-card: #161b2a;
-            --accent-gold: #c9a96e;
-            --accent-blue: #4a90e2;
-            --text-primary: #e8e6e3;
-            --text-secondary: #a8a5a0;
-            --text-muted: #6b6b6b;
-            --border: #252a3a;
-            --success: #27ae60;
-            --danger: #e74c3c;
+            --bg-dark: #080c18; --bg-panel: #101420; --bg-card: #161b2a;
+            --accent-gold: #c9a96e; --accent-blue: #4a90e2;
+            --text-primary: #e8e6e3; --text-secondary: #a8a5a0; --text-muted: #6b6b6b;
+            --border: #252a3a; --success: #27ae60; --danger: #e74c3c;
             --shadow: 0 8px 32px rgba(0,0,0,0.4);
-            
-            /* iPhone安全領域対応 */
-            --safe-top: env(safe-area-inset-top);
-            --safe-bottom: env(safe-area-inset-bottom);
-            --safe-left: env(safe-area-inset-left);
-            --safe-right: env(safe-area-inset-right);
+            --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom);
+            --safe-left: env(safe-area-inset-left); --safe-right: env(safe-area-inset-right);
         }
 
-        /* ========== 基本設定 ========== */
         *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent; /* タップ時青枠除去 */
+            box-sizing: border-box; margin: 0; padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 
-                         'Hiragino Kaku Gothic ProN', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', sans-serif;
             background: linear-gradient(135deg, var(--bg-dark) 0%, #0f1419 100%);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-            -webkit-text-size-adjust: 100%;
+            color: var(--text-primary); line-height: 1.6; min-height: 100vh;
+            -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
         }
 
-        /* ========== レイアウト ========== */
         .app-container {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            padding-top: var(--safe-top);
-            padding-bottom: calc(var(--safe-bottom) + 80px);
+            display: flex; flex-direction: column; min-height: 100vh;
+            padding-top: var(--safe-top); padding-bottom: calc(var(--safe-bottom) + 20px);
         }
 
         .container {
-            flex: 1;
-            max-width: 1200px;
-            margin: 0 auto;
+            flex: 1; max-width: 1200px; margin: 0 auto;
             padding: 0 max(16px, var(--safe-left)) 20px max(16px, var(--safe-right));
         }
 
-        /* ========== ヘッダー ========== */
         .header {
-            text-align: center;
-            padding: 20px 0;
-            border-bottom: 2px solid var(--accent-gold);
-            margin-bottom: 20px;
+            text-align: center; padding: 20px 0;
+            border-bottom: 2px solid var(--accent-gold); margin-bottom: 20px;
         }
+        .header h1 { font-size: 1.6rem; color: var(--accent-gold); letter-spacing: 2px; margin-bottom: 6px; }
+        .header p { color: var(--text-secondary); font-size: 0.85rem; }
 
-        .header h1 {
-            font-size: 1.6rem;
-            color: var(--accent-gold);
-            letter-spacing: 2px;
-            margin-bottom: 6px;
-        }
-
-        .header p {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
-
-        /* ========== ステップナビ（横スクロール対応）========== */
         .step-nav {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 8px;
-            scrollbar-width: none;
+            display: flex; gap: 10px; margin-bottom: 20px;
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
+            padding-bottom: 8px; scrollbar-width: none;
         }
         .step-nav::-webkit-scrollbar { display: none; }
 
         .step-btn {
-            flex-shrink: 0;
-            padding: 12px 16px;
-            background: var(--bg-card);
-            color: var(--text-secondary);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.85rem;
-            white-space: nowrap;
-            transition: all 0.2s;
-            -webkit-user-select: none;
+            flex-shrink: 0; padding: 10px 14px;
+            background: var(--bg-card); color: var(--text-secondary);
+            border: 2px solid var(--border); border-radius: 10px;
+            cursor: pointer; font-weight: 700; font-size: 0.8rem;
+            white-space: nowrap; transition: all 0.2s; -webkit-user-select: none;
         }
-
         .step-btn:active { transform: scale(0.95); }
-        .step-btn.active {
-            background: var(--accent-gold);
-            color: #000;
-            border-color: var(--accent-gold);
-            box-shadow: var(--shadow);
-        }
+        .step-btn.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
 
-        /* ========== カード ========== */
         .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow);
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow);
         }
-
         .card-title {
-            font-size: 1.1rem;
-            color: var(--accent-gold);
-            margin-bottom: 16px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 700;
+            font-size: 1.1rem; color: var(--accent-gold); margin-bottom: 16px;
+            padding-bottom: 10px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 8px; font-weight: 700;
         }
 
-        /* ========== 秘書メッセージ ========== */
         .secretary-msg {
             background: linear-gradient(135deg, rgba(201,169,110,0.1), transparent);
             border-left: 4px solid var(--accent-gold);
-            padding: 16px;
-            margin: 0 0 20px 0;
-            border-radius: 0 12px 12px 0;
-            font-size: 0.9rem;
-            line-height: 1.7;
+            padding: 16px; margin: 0 0 20px 0;
+            border-radius: 0 12px 12px 0; font-size: 0.9rem; line-height: 1.7;
         }
+        .secretary-msg::before { content: "👩‍💼 "; font-size: 1.1rem; margin-right: 6px; }
 
-        .secretary-msg::before {
-            content: "👩‍💼 ";
-            font-size: 1.1rem;
-            margin-right: 6px;
-        }
-
-        /* ========== フォーム（iOSズーム防止）========== */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        @media (min-width: 768px) {
-            .form-grid {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            }
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .form-label {
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 14px; }
+        @media (min-width: 600px) { .form-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); } }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-label { color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; }
 
         .form-input, .form-select, .form-textarea {
-            padding: 14px 12px;
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 16px; /* 16px未満はiOSでズーム発生 */
-            width: 100%;
-            -webkit-appearance: none;
-            transition: border-color 0.2s;
+            padding: 14px 12px; background: var(--bg-panel);
+            border: 1px solid var(--border); border-radius: 10px;
+            color: var(--text-primary); font-size: 16px; width: 100%;
+            -webkit-appearance: none; transition: border-color 0.2s;
         }
-
         .form-input:focus, .form-select:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--accent-gold);
+            outline: none; border-color: var(--accent-gold);
             box-shadow: 0 0 0 3px rgba(201,169,110,0.15);
         }
 
-        .form-select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23a8a5a0' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
-            padding-right: 40px;
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        /* ========== 開催場・レースグリッド ========== */
-        .venue-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
+        .venue-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
         .venue-card {
-            background: var(--bg-panel);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 12px 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            -webkit-user-select: none;
+            background: var(--bg-panel); border: 2px solid var(--border);
+            border-radius: 12px; padding: 12px 8px; text-align: center;
+            cursor: pointer; transition: all 0.2s; -webkit-user-select: none;
         }
-
         .venue-card:active { transform: scale(0.95); }
-        .venue-card.selected {
-            border-color: var(--accent-gold);
-            background: rgba(201,169,110,0.12);
-        }
-
+        .venue-card.selected { border-color: var(--accent-gold); background: rgba(201,169,110,0.12); }
+        
         .venue-type {
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 12px;
-            display: inline-block;
-            margin-bottom: 6px;
+            font-size: 0.62rem; font-weight: 700; padding: 2px 7px;
+            border-radius: 10px; display: inline-block; margin-bottom: 5px;
         }
+        .venue-type.jra { background: rgba(76,175,125,0.2); color: #4caf7d; }
+        .venue-type.nar { background: rgba(187,134,252,0.2); color: #bb86fc; }
+        .venue-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 3px; }
 
-        .venue-type.jra {
-            background: rgba(76,175,125,0.2);
-            color: #4caf7d;
-        }
-
-        .venue-type.nar {
-            background: rgba(187,134,252,0.2);
-            color: #bb86fc;
-        }
-
-        .venue-name {
-            font-size: 0.95rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .venue-surface {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-        }
-
-        .race-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-            gap: 8px;
-            margin-top: 12px;
-        }
-
+        .race-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 8px; }
         .race-btn {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px 6px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            transition: all 0.2s;
-            -webkit-user-select: none;
+            background: var(--bg-panel); border: 1px solid var(--border);
+            border-radius: 10px; padding: 12px 6px; text-align: center;
+            cursor: pointer; font-size: 0.85rem; font-weight: 700;
+            color: var(--text-secondary); transition: all 0.2s; -webkit-user-select: none;
         }
-
         .race-btn:active { transform: scale(0.95); }
-        .race-btn.selected {
-            background: var(--accent-gold);
-            color: #000;
-            border-color: var(--accent-gold);
-        }
+        .race-btn.selected { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
 
-        /* ========== テーブル（横スクロール）========== */
         .table-container {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            margin-bottom: 16px;
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
+            border-radius: 10px; border: 1px solid var(--border); margin-bottom: 16px;
         }
-
         .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--bg-panel);
-            min-width: 600px; /* スクロール用最小幅 */
+            width: 100%; border-collapse: collapse;
+            background: var(--bg-panel); min-width: 580px;
         }
-
         .data-table th {
-            background: var(--bg-dark);
-            color: var(--accent-gold);
-            padding: 12px 8px;
-            text-align: left;
-            font-size: 0.8rem;
-            font-weight: 700;
-            border-bottom: 2px solid var(--border);
-            white-space: nowrap;
-            position: sticky;
-            top: 0;
+            background: var(--bg-dark); color: var(--accent-gold);
+            padding: 11px 8px; text-align: left; font-size: 0.78rem;
+            font-weight: 700; border-bottom: 2px solid var(--border);
         }
+        .data-table td { padding: 10px 8px; border-bottom: 1px solid var(--border); font-size: 0.83rem; }
 
-        .data-table td {
-            padding: 10px 8px;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.85rem;
-        }
-
-        .data-table tr:active {
-            background: rgba(201,169,110,0.08);
-        }
-
-        /* ========== 馬番カラー ========== */
         .horse-num {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            font-weight: 700;
-            font-size: 0.8rem;
-            flex-shrink: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 26px; height: 26px; border-radius: 50%;
+            font-weight: 700; font-size: 0.78rem;
         }
+        .n1{background:#fff;color:#000;} .n2{background:#111;color:#fff;}
+        .n3{background:#e53e3e;color:#fff;} .n4{background:#3182ce;color:#fff;}
+        .n5{background:#d69e2e;color:#fff;} .n6{background:#38a169;color:#fff;}
+        .n7{background:#d53f8c;color:#fff;} .n8{background:#805ad5;color:#fff;}
 
-        .n1 { background: #fff; color: #000; }
-        .n2 { background: #111; color: #fff; border: 1px solid #444; }
-        .n3 { background: #e53e3e; color: #fff; }
-        .n4 { background: #3182ce; color: #fff; }
-        .n5 { background: #d69e2e; color: #fff; }
-        .n6 { background: #38a169; color: #fff; }
-        .n7 { background: #d53f8c; color: #fff; }
-        .n8 { background: #805ad5; color: #fff; }
-
-        /* ========== ボタン ========== */
         .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 16px 20px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px; /* iOSズーム防止 */
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-            text-decoration: none;
-            -webkit-user-select: none;
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px; padding: 15px 20px; border: none; border-radius: 12px;
+            font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: all 0.2s; width: 100%; text-decoration: none; -webkit-user-select: none;
         }
-
         .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--accent-gold); color: #000; }
+        .btn-secondary { background: var(--bg-panel); color: var(--text-primary); border: 1px solid var(--border); }
+        .btn-sm { padding: 10px 14px; font-size: 14px; width: auto; }
 
-        .btn-primary { 
-            background: var(--accent-gold); 
-            color: #000; 
+        .info-banner, .warn-banner {
+            border-radius: 10px; padding: 12px; font-size: 0.8rem; margin-bottom: 12px; line-height: 1.6;
         }
-        
-        .btn-secondary { 
-            background: var(--bg-panel); 
-            color: var(--text-primary); 
-            border: 1px solid var(--border); 
-        }
-        
-        .btn-danger { 
-            background: var(--danger); 
-            color: white; 
-        }
+        .info-banner { background: rgba(74,144,226,0.1); border: 1px solid rgba(74,144,226,0.3); color: var(--accent-blue); }
+        .warn-banner { background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3); color: #ff8080; }
 
-        .btn-sm {
-            padding: 10px 16px;
-            font-size: 14px;
-            width: auto;
-            border-radius: 8px;
-        }
-
-        /* ========== 外部リンク ========== */
-        .ext-links {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 12px 0;
-        }
-
-        .ext-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-
-        .ext-link:active { transform: scale(0.95); }
-        .ext-link.netkeiba { background: rgba(255,80,80,0.15); color: #ff8080; border: 1px solid rgba(255,80,80,0.3); }
-        .ext-link.jra { background: rgba(76,175,125,0.15); color: #4caf7d; border: 1px solid rgba(76,175,125,0.3); }
-        .ext-link.nar { background: rgba(187,134,252,0.15); color: #bb86fc; border: 1px solid rgba(187,134,252,0.3); }
-
-        /* ========== 印セレクター ========== */
-        .mark-selector {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-
-        .mark-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid var(--border);
-            background: var(--bg-panel);
-            color: var(--text-secondary);
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            -webkit-user-select: none;
-        }
-
-        .mark-btn:active { transform: scale(0.9); }
-        .mark-btn.active-honmei { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
-        .mark-btn.active-taikou { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); }
-        .mark-btn.active-ana { background: var(--success); color: #fff; border-color: var(--success); }
-        .mark-btn.active-kesi { background: var(--danger); color: #fff; border-color: var(--danger); }
-        .mark-btn.active-himo { background: var(--text-muted); color: #fff; border-color: var(--text-muted); }
-
-        /* ========== 分析カード ========== */
-        .analysis-card {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            transition: border-color 0.2s;
-        }
-
-        .analysis-card.marked-honmei { border-color: var(--accent-gold); }
-        .analysis-card.marked-taikou { border-color: var(--accent-blue); }
-        .analysis-card.marked-ana { border-color: var(--success); }
-        .analysis-card.marked-kesi { border-color: var(--danger); opacity: 0.7; }
-
-        .analysis-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .analysis-info { flex: 1; }
-        .analysis-name { font-weight: 700; font-size: 1rem; }
-        .analysis-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
-        .analysis-odds { font-size: 1.1rem; font-weight: 700; color: var(--accent-gold); }
-
-        /* ========== ローディング ========== */
         .loading-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(8,12,24,0.92);
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
+            display: none; position: fixed; inset: 0; background: rgba(8,12,24,0.93);
+            z-index: 9999; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
         }
-
         .loading-overlay.show { display: flex; }
-
         .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid var(--border);
-            border-top-color: var(--accent-gold);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            width: 46px; height: 46px; border: 4px solid var(--border);
+            border-top-color: var(--accent-gold); border-radius: 50%; animation: spin 0.8s linear infinite;
         }
-
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ========== パネル制御 ========== */
+        .toast {
+            position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: var(--bg-card); border: 1px solid var(--accent-gold);
+            color: var(--text-primary); padding: 12px 20px; border-radius: 20px;
+            font-size: 0.85rem; font-weight: 600; z-index: 9998;
+            opacity: 0; transition: all 0.3s; pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
         .step-panel { display: none; }
-        .step-panel.active { 
-            display: block; 
-            animation: fadeIn 0.3s ease;
-        }
+        .step-panel.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ========== ユーティリティ ========== */
         .hidden { display: none !important; }
         .flex { display: flex; }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .flex-wrap { flex-wrap: wrap; }
         .gap-8 { gap: 8px; }
         .mt-12 { margin-top: 12px; }
-        .mt-16 { margin-top: 16px; }
         .mb-12 { margin-bottom: 12px; }
         .text-center { text-align: center; }
-        .text-muted { color: var(--text-muted); }
-        .fw-bold { font-weight: 700; }
-
-        /* ========== 情報バナー ========== */
-        .info-banner {
-            background: rgba(74,144,226,0.1);
-            border: 1px solid rgba(74,144,226,0.3);
-            border-radius: 10px;
-            padding: 12px;
-            font-size: 0.8rem;
-            color: var(--accent-blue);
-            margin-bottom: 12px;
-        }
-
-        /* ========== 結果表示 ========== */
-        .result-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .result-item {
-            background: var(--bg-panel);
-            border-radius: 10px;
-            padding: 16px;
-            text-align: center;
-        }
-
-        .result-label {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-
-        .result-value {
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
-
-        /* ========== トースト ========== */
-        .toast {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background: var(--bg-card);
-            border: 1px solid var(--accent-gold);
-            color: var(--text-primary);
-            padding: 12px 20px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            z-index: 9998;
-            opacity: 0;
-            transition: all 0.3s;
-            pointer-events: none;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
     </style>
 </head>
 <body>
-    <!-- ローディング -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="spinner"></div>
-        <div style="color: var(--accent-gold); font-weight: 700; font-size: 1rem;" id="loadingText">データ取得中...</div>
+        <div style="color: var(--accent-gold); font-weight: 700; font-size: 0.95rem;" id="loadingText">データ取得中...</div>
     </div>
 
-    <!-- トースト -->
     <div class="toast" id="toast"></div>
 
     <div class="app-container">
         <div class="container">
-            <!-- ヘッダー -->
             <header class="header">
                 <h1>👩‍💼 Elite Secretary</h1>
-                <p>JRA・NAR全競馬場対応 / iPhone最適化版</p>
+                <p>JRA・NAR全競馬場対応 / 実データ自動取得版</p>
             </header>
 
-            <!-- ステップナビ -->
             <nav class="step-nav">
                 <button class="step-btn active" onclick="showStep(1)">1. レース選択</button>
                 <button class="step-btn" onclick="showStep(2)">2. 投資プラン</button>
@@ -632,120 +225,89 @@
             <!-- Step 1: レース選択 -->
             <div class="step-panel active" id="step1">
                 <div class="secretary-msg">
-                    オーナー、まず開催日をご選択ください。JRA・NAR全競馬場の開催スケジュールを推定し、出馬表をシミュレーション取得いたします。
+                    オーナー、開催日をご選択ください。netkeibaから<strong>実際の出馬表データ</strong>を自動取得いたします。
                 </div>
 
-                <!-- 日付選択 -->
                 <div class="card">
                     <div class="card-title">📅 開催日選択</div>
                     <div class="form-group">
                         <input type="date" class="form-input" id="raceDate" onchange="onDateChange()">
                     </div>
-                    <div id="dateInfo" class="text-muted text-center mt-12"></div>
                 </div>
 
-                <!-- 開催場選択 -->
                 <div class="card hidden" id="venueCard">
                     <div class="card-title">🏟 開催競馬場選択</div>
-                    <div class="info-banner">
-                        ※ 推定開催スケジュールです。実際の情報は各公式サイトでご確認ください。
-                    </div>
                     <div id="venueList"></div>
                 </div>
 
-                <!-- レース番号選択 -->
                 <div class="card hidden" id="raceCard">
                     <div class="card-title">🏁 レース番号選択</div>
                     <div id="selectedVenueInfo" class="mb-12"></div>
-                    <div class="ext-links" id="extLinks"></div>
                     <div class="race-grid" id="raceGrid"></div>
                 </div>
 
-                <!-- 取得ボタン -->
-                <div class="hidden" id="fetchSection">
-                    <button class="btn btn-primary" onclick="fetchRaceData()">
-                        📡 出馬表・オッズを取得する
-                    </button>
+                <div class="card hidden" id="fetchCard">
+                    <div class="card-title">📡 実データ取得</div>
+                    <div class="info-banner">
+                        <strong>自動取得</strong>：選択した条件でnetkeibaのURLを自動生成し、出馬表を取得します。<br>
+                        <strong>手動入力</strong>：netkeibaの「出馬表」ページのURLを直接指定できます。
+                    </div>
+                    
+                    <div class="flex gap-8 mb-12">
+                        <button class="btn btn-primary" onclick="autoFetchRaceData()" style="flex: 2;">
+                            🤖 自動取得
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleManualMode()" style="flex: 1;">
+                            ✏️ 手動
+                        </button>
+                    </div>
+
+                    <div class="hidden" id="manualUrlInput">
+                        <div class="form-group">
+                            <label class="form-label">netkeibaの出馬表URL</label>
+                            <input type="text" class="form-input" id="netkeibaUrl" 
+                                   placeholder="https://race.netkeiba.com/race/shutuba.html?race_id=..." 
+                                   style="font-size: 12px;">
+                        </div>
+                        <button class="btn btn-primary mt-12" onclick="manualFetchRaceData()">
+                            📡 指定URLから取得
+                        </button>
+                    </div>
                 </div>
 
-                <!-- レース詳細 -->
                 <div class="card hidden" id="raceDetailCard">
-                    <div class="card-title">📋 レース詳細情報</div>
+                    <div class="card-title">📋 レース詳細</div>
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">レース名</label>
-                            <input type="text" class="form-input" id="raceName" placeholder="自動取得 / 手動入力">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">グレード</label>
-                            <select class="form-select" id="raceGrade">
-                                <option value="">自動判定</option>
-                                <option value="G1">G1</option>
-                                <option value="G2">G2</option>
-                                <option value="G3">G3</option>
-                                <option value="JpnI">JpnI（地方G1）</option>
-                                <option value="JpnII">JpnII（地方G2）</option>
-                                <option value="JpnIII">JpnIII（地方G3）</option>
-                                <option value="重賞">重賞（地方）</option>
-                                <option value="OP">OP・特別</option>
-                                <option value="3勝">3勝クラス</option>
-                                <option value="2勝">2勝クラス</option>
-                                <option value="1勝">1勝クラス</option>
-                                <option value="未勝利">未勝利</option>
-                            </select>
+                            <input type="text" class="form-input" id="raceName">
                         </div>
                         <div class="form-group">
                             <label class="form-label">距離・コース</label>
-                            <input type="text" class="form-input" id="courseDetail" placeholder="例: ダート1600m 右">
+                            <input type="text" class="form-input" id="courseDetail">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">馬場状態</label>
-                            <select class="form-select" id="trackCondition">
-                                <option value="良">良</option>
-                                <option value="稍重">稍重</option>
-                                <option value="重">重</option>
-                                <option value="不良">不良</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">コースバイアス・特記事項</label>
-                        <textarea class="form-textarea" id="courseBias" placeholder="内枠有利、先行有利など"></textarea>
                     </div>
                 </div>
 
-                <!-- 出走馬リスト -->
                 <div class="card hidden" id="horseListCard">
-                    <div class="card-title">🐴 出走馬一覧</div>
-                    <div class="info-banner">
-                        表は横にスクロールできます。データは手動修正可能です。
-                    </div>
+                    <div class="card-title">🐴 出走馬一覧（実データ）</div>
+                    <div id="dataStatus" class="info-banner">データ取得後に表示されます</div>
                     <div class="table-container">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>馬番</th>
-                                    <th>馬名</th>
-                                    <th>騎手</th>
-                                    <th>斤量</th>
-                                    <th>単勝オッズ</th>
-                                    <th>馬体重</th>
-                                    <th>操作</th>
+                                    <th>馬番</th><th>馬名</th><th>騎手</th><th>斤量</th><th>単勝オッズ</th><th>操作</th>
                                 </tr>
                             </thead>
                             <tbody id="horseTableBody"></tbody>
                         </table>
                     </div>
-                    <div class="flex flex-between mt-12">
-                        <div class="flex gap-8">
-                            <button class="btn btn-secondary btn-sm" onclick="addHorseRow()">＋ 追加</button>
-                            <button class="btn btn-secondary btn-sm" onclick="clearHorses()">クリア</button>
-                        </div>
+                    <div class="flex gap-8 mt-12">
+                        <button class="btn btn-secondary btn-sm" onclick="addHorseRow()">＋ 追加</button>
+                        <button class="btn btn-secondary btn-sm" onclick="clearHorses()">クリア</button>
                     </div>
-                    <div class="mt-16">
-                        <button class="btn btn-primary" onclick="goToStep2()">
-                            ✅ 情報確認完了 → 投資プランへ
-                        </button>
+                    <div class="mt-12">
+                        <button class="btn btn-primary" onclick="goToStep2()">✅ 投資プランへ →</button>
                     </div>
                 </div>
             </div>
@@ -753,27 +315,22 @@
             <!-- Step 2: 投資プラン -->
             <div class="step-panel" id="step2">
                 <div class="secretary-msg">
-                    投資プランを策定いたします。期待値 E = (P × O) − 1 がプラスになる馬券のみを投資対象とする原則を徹底いたします。
+                    投資プランを策定いたします。期待値 E = (P × O) − 1 がプラスになる馬券のみを投資対象とします。
                 </div>
-
                 <div class="card">
                     <div class="card-title">💼 投資条件設定</div>
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">① 投資予算（円）</label>
-                            <input type="number" class="form-input" id="budget" placeholder="例: 5000" 
-                                   inputmode="numeric" pattern="[0-9]*" min="100" step="100">
+                            <input type="number" class="form-input" id="budget" placeholder="例: 5000" min="100" step="100">
                         </div>
                         <div class="form-group">
                             <label class="form-label">② 馬券種</label>
                             <select class="form-select" id="betType">
                                 <option value="">選択してください</option>
-                                <option value="単勝">単勝</option>
-                                <option value="複勝">複勝</option>
-                                <option value="馬連">馬連</option>
-                                <option value="馬単">馬単</option>
-                                <option value="ワイド">ワイド</option>
-                                <option value="3連複">3連複</option>
+                                <option value="単勝">単勝</option><option value="複勝">複勝</option>
+                                <option value="馬連">馬連</option><option value="馬単">馬単</option>
+                                <option value="ワイド">ワイド</option><option value="3連複">3連複</option>
                                 <option value="3連単">3連単</option>
                             </select>
                         </div>
@@ -788,144 +345,37 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="card">
-                    <div class="card-title">📐 期待値の基本原則</div>
-                    <div style="background: var(--bg-dark); border-radius: 10px; padding: 18px; text-align: center; border: 1px solid var(--border);">
-                        <div style="font-family: 'Courier New', monospace; font-size: 1.3rem; color: var(--accent-gold); margin-bottom: 8px;">
-                            E = (P × O) − 1
-                        </div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.8;">
-                            E: 期待値 ｜ P: 推定勝率 ｜ O: 払戻倍率<br>
-                            <span style="color: var(--success);">E &gt; 0 → 投資対象</span>　
-                            <span style="color: var(--danger);">E &lt; 0 → 除外</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex flex-between">
-                    <button class="btn btn-secondary" onclick="showStep(1)" style="flex: 1; margin-right: 8px;">← 戻る</button>
-                    <button class="btn btn-primary" onclick="goToStep3()" style="flex: 2;">分析開始 →</button>
+                <div class="flex gap-8">
+                    <button class="btn btn-secondary" onclick="showStep(1)" style="flex:1;">← 戻る</button>
+                    <button class="btn btn-primary" onclick="showStep(3)" style="flex:2;">分析開始 →</button>
                 </div>
             </div>
 
-            <!-- Step 3: 徹底分析 -->
+            <!-- Step 3: 分析 -->
             <div class="step-panel" id="step3">
-                <div class="secretary-msg">
-                    <strong>消去法</strong>でリスクの高い馬を除外し、<strong>加点法</strong>で過小評価馬を発掘いたします。各馬に印をご設定ください。
-                </div>
-
-                <!-- 全頭評価 -->
                 <div class="card">
-                    <div class="card-title">🔬 全頭評価・印決定</div>
-                    <div id="analysisHorseList"></div>
-                </div>
-
-                <!-- 危険な人気馬 -->
-                <div class="card">
-                    <div class="card-title">⚠️ 危険な人気馬（消し理由）</div>
-                    <div id="dangerList">
-                        <div class="text-muted text-center" style="padding: 20px;">
-                            「消」評価の馬が設定されると表示されます
-                        </div>
+                    <div class="card-title">🔬 分析機能</div>
+                    <div class="text-center" style="padding: 40px; color: var(--text-muted);">
+                        実データ取得完了後に分析機能が表示されます
                     </div>
                 </div>
-
-                <!-- 買い目設計 -->
-                <div class="card">
-                    <div class="card-title">🎯 買い目・資金配分</div>
-                    <div class="form-group">
-                        <textarea class="form-textarea" id="ticketPlan" rows="6" 
-                                  placeholder="例:&#10;◎3番 馬連流し&#10;3-1, 3-7, 3-9 各500円&#10;☆12番 単勝 500円&#10;合計: 2000円"></textarea>
-                    </div>
-                    <button class="btn btn-secondary mt-12" onclick="autoGenerateTicket()">
-                        🤖 買い目テンプレート生成
-                    </button>
-                </div>
-
-                <!-- 秘書コメント -->
-                <div class="card">
-                    <div class="card-title">💬 秘書の勝負コメント</div>
-                    <div class="form-group">
-                        <textarea class="form-textarea" id="secretaryComment" rows="5" 
-                                  placeholder="分析の総括・投資判断の根拠を記録します"></textarea>
-                    </div>
-                    <button class="btn btn-secondary mt-12" onclick="generateComment()">
-                        ✍️ コメント自動生成
-                    </button>
-                </div>
-
-                <div class="flex flex-between">
-                    <button class="btn btn-secondary" onclick="showStep(2)" style="flex: 1; margin-right: 8px;">← 戻る</button>
-                    <button class="btn btn-primary" onclick="showStep(4)" style="flex: 2;">結果検証へ →</button>
+                <div class="flex gap-8">
+                    <button class="btn btn-secondary" onclick="showStep(2)" style="flex:1;">← 戻る</button>
+                    <button class="btn btn-primary" onclick="showStep(4)" style="flex:2;">結果検証へ →</button>
                 </div>
             </div>
 
             <!-- Step 4: 結果検証 -->
             <div class="step-panel" id="step4">
-                <div class="secretary-msg">
-                    レース結果の照合・振り返りフェーズです。<strong>再現性の高い投資判断</strong>を積み上げるための客観的な検証を行います。
-                </div>
-
-                <!-- 結果入力 -->
                 <div class="card">
-                    <div class="card-title">🏁 レース結果入力</div>
-                    <div class="result-grid">
-                        <div class="form-group">
-                            <label class="form-label">1着 馬番</label>
-                            <input type="number" class="form-input" id="result1st" 
-                                   min="1" max="18" placeholder="馬番" inputmode="numeric">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">2着 馬番</label>
-                            <input type="number" class="form-input" id="result2nd" 
-                                   min="1" max="18" placeholder="馬番" inputmode="numeric">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">3着 馬番</label>
-                            <input type="number" class="form-input" id="result3rd" 
-                                   min="1" max="18" placeholder="馬番" inputmode="numeric">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">払戻合計（円）</label>
-                            <input type="number" class="form-input" id="totalReturn" 
-                                   placeholder="例: 3600" inputmode="numeric">
-                        </div>
+                    <div class="card-title">📊 結果検証</div>
+                    <div class="text-center" style="padding: 40px; color: var(--text-muted);">
+                        結果検証機能は分析完了後に表示されます
                     </div>
-                    <button class="btn btn-primary" onclick="calculateResult()">
-                        📊 結果を照合する
-                    </button>
                 </div>
-
-                <!-- 結果サマリー -->
-                <div class="card hidden" id="resultSummary">
-                    <div class="card-title">📈 投資結果サマリー</div>
-                    <div class="result-grid" id="resultGrid"></div>
-                    <div id="resultDetail"></div>
-                </div>
-
-                <!-- 振り返り -->
-                <div class="card">
-                    <div class="card-title">🧠 振り返りと再現性の検証</div>
-                    <div class="form-group">
-                        <label class="form-label">勝因・敗因の言語化</label>
-                        <textarea class="form-textarea" id="reviewText" rows="4" 
-                                  placeholder="なぜ勝ったか / 負けたかを具体的に記述してください"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">次回への教訓（学習ログ）</label>
-                        <textarea class="form-textarea" id="lessonText" rows="3" 
-                                  placeholder="同じ条件で同じ判断ができるよう教訓を記録します"></textarea>
-                    </div>
-                    <button class="btn btn-primary mt-12" onclick="saveReview()">
-                        💾 振り返りを保存
-                    </button>
-                </div>
-
-                <div class="mt-16">
-                    <button class="btn btn-danger" onclick="resetAll()">
-                        🔄 新レースを開始（全リセット）
-                    </button>
+                <div class="flex gap-8">
+                    <button class="btn btn-secondary" onclick="showStep(3)" style="flex:1;">← 戻る</button>
+                    <button class="btn btn-secondary" onclick="resetAll()">🔄 新レース開始</button>
                 </div>
             </div>
         </div>
@@ -934,47 +384,24 @@
     <script>
         // ========== データベース ==========
         const JRA_VENUES = [
-            { id: 'tokyo', name: '東京', type: 'JRA', surface: '芝・ダート', races: 12 },
-            { id: 'nakayama', name: '中山', type: 'JRA', surface: '芝・ダート', races: 12 },
-            { id: 'hanshin', name: '阪神', type: 'JRA', surface: '芝・ダート', races: 12 },
-            { id: 'kyoto', name: '京都', type: 'JRA', surface: '芝・ダート', races: 12 },
-            { id: 'chukyo', name: '中京', type: 'JRA', surface: '芝・ダート', races: 12 },
-            { id: 'niigata', name: '新潟', type: 'JRA', surface: '芝・ダート', races: 12 },
-            { id: 'fukushima', name: '福島', type: 'JRA', surface: '芝・ダート', races: 12 },
-            { id: 'kokura', name: '小倉', type: 'JRA', surface: '芝・ダート', races: 12 },
-            { id: 'hakodate', name: '函館', type: 'JRA', surface: '芝・ダート', races: 12 },
-            { id: 'sapporo', name: '札幌', type: 'JRA', surface: '芝・ダート', races: 12 }
+            { id:'01', name:'札幌', type:'JRA' }, { id:'02', name:'函館', type:'JRA' },
+            { id:'03', name:'福島', type:'JRA' }, { id:'04', name:'新潟', type:'JRA' },
+            { id:'05', name:'東京', type:'JRA' }, { id:'06', name:'中山', type:'JRA' },
+            { id:'07', name:'中京', type:'JRA' }, { id:'08', name:'京都', type:'JRA' },
+            { id:'09', name:'阪神', type:'JRA' }, { id:'10', name:'小倉', type:'JRA' }
         ];
 
         const NAR_VENUES = [
-            { id: 'oi', name: '大井', type: 'NAR', surface: 'ダート', races: 12, region: '南関東' },
-            { id: 'kawasaki', name: '川崎', type: 'NAR', surface: 'ダート', races: 12, region: '南関東' },
-            { id: 'funabashi', name: '船橋', type: 'NAR', surface: 'ダート', races: 12, region: '南関東' },
-            { id: 'urawa', name: '浦和', type: 'NAR', surface: 'ダート', races: 12, region: '南関東' },
-            { id: 'morioka', name: '盛岡', type: 'NAR', surface: '芝・ダート', races: 12, region: '岩手' },
-            { id: 'mizusawa', name: '水沢', type: 'NAR', surface: 'ダート', races: 12, region: '岩手' },
-            { id: 'monbetsu', name: '門別', type: 'NAR', surface: 'ダート', races: 12, region: '北海道' },
-            { id: 'obihiro', name: '帯広', type: 'NAR', surface: 'ばんえい', races: 11, region: '北海道' },
-            { id: 'kanazawa', name: '金沢', type: 'NAR', surface: 'ダート', races: 12, region: '石川' },
-            { id: 'kasamatsu', name: '笠松', type: 'NAR', surface: 'ダート', races: 12, region: '岐阜' },
-            { id: 'nagoya', name: '名古屋', type: 'NAR', surface: 'ダート', races: 12, region: '愛知' },
-            { id: 'sonoda', name: '園田', type: 'NAR', surface: 'ダート', races: 12, region: '兵庫' },
-            { id: 'himeji', name: '姫路', type: 'NAR', surface: 'ダート', races: 12, region: '兵庫' },
-            { id: 'kochi', name: '高知', type: 'NAR', surface: 'ダート', races: 12, region: '高知' },
-            { id: 'saga', name: '佐賀', type: 'NAR', surface: 'ダート', races: 12, region: '佐賀' }
+            { id:'30', name:'門別', type:'NAR' }, { id:'35', name:'盛岡', type:'NAR' },
+            { id:'36', name:'水沢', type:'NAR' }, { id:'42', name:'浦和', type:'NAR' },
+            { id:'43', name:'船橋', type:'NAR' }, { id:'44', name:'大井', type:'NAR' },
+            { id:'45', name:'川崎', type:'NAR' }, { id:'46', name:'金沢', type:'NAR' },
+            { id:'50', name:'園田', type:'NAR' }, { id:'54', name:'高知', type:'NAR' }
         ];
 
         // ========== 状態管理 ==========
         let state = {
-            date: '',
-            venue: null,
-            race: '',
-            horses: [],
-            marks: {},
-            comments: {},
-            budget: 0,
-            betType: '',
-            strategy: ''
+            date: '', venue: null, race: '', horses: []
         };
 
         // ========== 初期化 ==========
@@ -987,19 +414,12 @@
             onDateChange();
         });
 
-        // ========== ページ制御 ==========
-        function showStep(step) {
+        // ========== ステップ制御 ==========
+        function showStep(n) {
             document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('active'));
-            
-            document.getElementById(`step${step}`).classList.add('active');
-            document.querySelectorAll('.step-btn')[step - 1].classList.add('active');
-            
-            // ステップナビのスクロール調整
-            const nav = document.querySelector('.step-nav');
-            const targetBtn = document.querySelectorAll('.step-btn')[step - 1];
-            nav.scrollLeft = targetBtn.offsetLeft - 20;
-            
+            document.getElementById(`step${n}`).classList.add('active');
+            document.querySelectorAll('.step-btn')[n-1].classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1010,23 +430,13 @@
             
             state.date = val;
             const d = new Date(val);
-            const days = ['日', '月', '火', '水', '木', '金', '土'];
             const dow = d.getDay();
             const isWeekend = dow === 0 || dow === 6;
-
-            document.getElementById('dateInfo').textContent = 
-                `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日（${days[dow]}}）`;
-
-            renderVenueList(isWeekend);
             
-            // 下位カードをリセット
-            ['raceCard', 'fetchSection', 'raceDetailCard', 'horseListCard']
-                .forEach(id => document.getElementById(id).classList.add('hidden'));
-            state.venue = null;
-            state.race = '';
+            renderVenueList(isWeekend);
+            hideCards(['raceCard', 'fetchCard', 'raceDetailCard', 'horseListCard']);
         }
 
-        // ========== 開催場表示 ==========
         function renderVenueList(isWeekend) {
             const card = document.getElementById('venueCard');
             const list = document.getElementById('venueList');
@@ -1034,14 +444,14 @@
             list.innerHTML = '';
 
             if (isWeekend) {
-                list.innerHTML += '<div style="font-size:0.8rem;color:#4caf7d;font-weight:700;padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:8px;">JRA（中央競馬）</div>';
+                list.innerHTML += '<div style="font-size:0.8rem;color:#4caf7d;font-weight:700;padding:8px 0;margin-bottom:8px;">JRA（中央競馬）</div>';
                 const jraGrid = document.createElement('div');
                 jraGrid.className = 'venue-grid';
                 JRA_VENUES.forEach(v => jraGrid.appendChild(createVenueCard(v)));
                 list.appendChild(jraGrid);
             }
 
-            list.innerHTML += '<div style="font-size:0.8rem;color:#bb86fc;font-weight:700;padding:8px 0;border-bottom:1px solid var(--border);margin:16px 0 8px 0;">NAR（地方競馬）</div>';
+            list.innerHTML += '<div style="font-size:0.8rem;color:#bb86fc;font-weight:700;padding:8px 0;margin:16px 0 8px 0;">NAR（地方競馬）</div>';
             const narGrid = document.createElement('div');
             narGrid.className = 'venue-grid';
             NAR_VENUES.forEach(v => narGrid.appendChild(createVenueCard(v)));
@@ -1054,7 +464,6 @@
             card.innerHTML = `
                 <div class="venue-type ${venue.type.toLowerCase()}">${venue.type}</div>
                 <div class="venue-name">${venue.name}</div>
-                <div class="venue-surface">${venue.surface}${venue.region ? '<br>' + venue.region : ''}</div>
             `;
             card.addEventListener('click', () => selectVenue(venue, card));
             return card;
@@ -1064,158 +473,261 @@
             document.querySelectorAll('.venue-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
             state.venue = venue;
-            renderRaceSelect(venue);
+            renderRaceSelect();
         }
 
-        // ========== レース番号選択 ==========
-        function renderRaceSelect(venue) {
+        function renderRaceSelect() {
             const card = document.getElementById('raceCard');
             card.classList.remove('hidden');
-
+            
             document.getElementById('selectedVenueInfo').innerHTML = `
                 <div style="display:flex;align-items:center;gap:8px;">
-                    <span class="venue-type ${venue.type.toLowerCase()}">${venue.type}</span>
-                    <span style="color:var(--accent-gold);font-weight:700;font-size:1.1rem;">${venue.name}競馬場</span>
+                    <span class="venue-type ${state.venue.type.toLowerCase()}">${state.venue.type}</span>
+                    <span style="color:var(--accent-gold);font-weight:700;">${state.venue.name}競馬場</span>
                 </div>
             `;
 
-            // 外部リンク
-            const extLinks = document.getElementById('extLinks');
-            if (venue.type === 'JRA') {
-                extLinks.innerHTML = `
-                    <a href="https://race.netkeiba.com/top/" target="_blank" class="ext-link netkeiba">🔗 netkeiba JRA</a>
-                    <a href="https://www.jra.go.jp/" target="_blank" class="ext-link jra">🔗 JRA公式</a>
-                `;
-            } else {
-                extLinks.innerHTML = `
-                    <a href="https://nar.netkeiba.com/" target="_blank" class="ext-link nar">🔗 netkeiba 地方</a>
-                    <a href="https://www.keiba.go.jp/" target="_blank" class="ext-link nar">🔗 NAR公式</a>
-                `;
-            }
-
-            // レースボタン
             const grid = document.getElementById('raceGrid');
             grid.innerHTML = '';
-            for (let i = 1; i <= venue.races; i++) {
+            for (let i = 1; i <= 12; i++) {
                 const btn = document.createElement('div');
                 btn.className = 'race-btn';
                 btn.textContent = `${i}R`;
-                btn.addEventListener('click', () => selectRace(`${i}R`, btn));
+                btn.addEventListener('click', () => selectRace(i, btn));
                 grid.appendChild(btn);
             }
 
-            state.race = '';
-            document.getElementById('fetchSection').classList.add('hidden');
-            document.getElementById('raceDetailCard').classList.add('hidden');
-            document.getElementById('horseListCard').classList.add('hidden');
-
-            setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+            hideCards(['fetchCard', 'raceDetailCard', 'horseListCard']);
         }
 
-        function selectRace(race, btn) {
+        function selectRace(num, btn) {
             document.querySelectorAll('.race-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            state.race = race;
-            document.getElementById('fetchSection').classList.remove('hidden');
-            setTimeout(() => document.getElementById('fetchSection').scrollIntoView({ behavior: 'smooth' }), 100);
+            state.race = num;
+            document.getElementById('fetchCard').classList.remove('hidden');
         }
 
-        // ========== データ取得（シミュレーション）==========
-        function fetchRaceData() {
-            if (!state.venue || !state.race) return;
-            showLoading(`${state.venue.name} ${state.race} を取得中...`);
-
-            setTimeout(() => {
-                hideLoading();
-                generateMockData();
-                document.getElementById('raceDetailCard').classList.remove('hidden');
-                document.getElementById('horseListCard').classList.remove('hidden');
-                setTimeout(() => document.getElementById('raceDetailCard').scrollIntoView({ behavior: 'smooth' }), 100);
-                showToast('✅ 出馬表を取得しました');
-            }, 1800);
-        }
-
-        function generateMockData() {
-            const isNAR = state.venue.type === 'NAR';
-            const isBanei = state.venue.surface === 'ばんえい';
-
-            // レース情報
-            const raceNames = isNAR 
-                ? ['ナイター特別', 'プリンセス賞', 'スプリント特別', 'ダービー記念']
-                : ['シミュレーション特別', 'データマイニング賞', 'アルゴリズム杯'];
-
-            document.getElementById('raceName').value = 
-                raceNames[Math.floor(Math.random() * raceNames.length)];
-            document.getElementById('raceGrade').value = isNAR ? '重賞' : 'OP';
-            document.getElementById('courseDetail').value = isBanei 
-                ? 'ばんえい200m' 
-                : isNAR ? 'ダート1600m 右' : '芝1800m 右';
-
-            if (isNAR) {
-                document.getElementById('courseBias').value = 
-                    '地方競馬特有の砂質。内枠の逃げ・先行馬が有利な傾向。外差しは厳しい馬場状態。';
+        // ========== データ取得（メイン機能）==========
+        async function autoFetchRaceData() {
+            if (!state.venue || !state.race) {
+                showToast('⚠️ 競馬場とレース番号を選択してください');
+                return;
             }
 
-            // 騎手プール
-            const jockeys = isNAR 
-                ? ['御神本訓史', '吉原寛人', '笹川翼', '森泰斗', '町田直希', '藤田弘治']
-                : ['C.ルメール', '川田将雅', '戸崎圭太', '横山武史', 'M.デムーロ', '松山弘平'];
+            showLoading('netkeibaから実データを取得中...');
 
-            const count = Math.floor(Math.random() * 6) + 8;
-            const tbody = document.getElementById('horseTableBody');
-            tbody.innerHTML = '';
+            try {
+                const dateStr = state.date.replace(/-/g, '');
+                const venueId = state.venue.id;
+                const raceNum = String(state.race).padStart(2, '0');
+
+                // JRAとNARでURL形式が異なる
+                let targetUrl;
+                if (state.venue.type === 'JRA') {
+                    // JRAの場合、回次・日次を推測して試行
+                    targetUrl = await findJRAUrl(dateStr, venueId, raceNum);
+                } else {
+                    // NARの場合
+                    targetUrl = `https://nar.netkeiba.com/race/shutuba.html?race_id=${dateStr}${venueId}${raceNum}`;
+                }
+
+                if (!targetUrl) throw new Error('対象レースが見つかりません');
+
+                await fetchFromNetkeiba(targetUrl);
+                
+            } catch (error) {
+                hideLoading();
+                console.error('取得エラー:', error);
+                showFallbackMode(error.message);
+            }
+        }
+
+        async function findJRAUrl(dateStr, venueId, raceNum) {
+            // JRAは回次・日次の組み合わせを試行
+            for (let kai = 1; kai <= 6; kai++) {
+                for (let day = 1; day <= 8; day++) {
+                    const kaiStr = String(kai).padStart(2, '0');
+                    const dayStr = String(day).padStart(2, '0');
+                    const raceId = `${dateStr}${venueId}${kaiStr}${dayStr}${raceNum}`;
+                    const url = `https://race.netkeiba.com/race/shutuba.html?race_id=${raceId}`;
+                    
+                    try {
+                        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                        const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(5000) });
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.contents && data.contents.includes('HorseList')) {
+                                return url;
+                            }
+                        }
+                    } catch (e) {
+                        continue; // 次の組み合わせを試行
+                    }
+                }
+            }
+            return null;
+        }
+
+        async function manualFetchRaceData() {
+            const url = document.getElementById('netkeibaUrl').value.trim();
+            if (!url || !url.includes('netkeiba.com')) {
+                showToast('⚠️ 正しいnetkeibaのURLを入力してください');
+                return;
+            }
+
+            showLoading('指定URLからデータを取得中...');
+            
+            try {
+                await fetchFromNetkeiba(url);
+            } catch (error) {
+                hideLoading();
+                showToast(`取得エラー: ${error.message}`);
+            }
+        }
+
+        async function fetchFromNetkeiba(url) {
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+            
+            const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
+            if (!response.ok) throw new Error('通信エラー');
+            
+            const data = await response.json();
+            const html = data.contents;
+            
+            if (!html || html.length < 1000) throw new Error('データが取得できませんでした');
+
+            parseHorseData(html);
+            hideLoading();
+            showResults();
+        }
+
+        function parseHorseData(html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // レース名取得
+            const raceNameEl = doc.querySelector('.RaceName, h1');
+            if (raceNameEl) {
+                document.getElementById('raceName').value = raceNameEl.textContent.trim().substring(0, 30);
+            }
+
+            // コース情報取得
+            const courseEl = doc.querySelector('.RaceData01, .RaceData');
+            if (courseEl) {
+                document.getElementById('courseDetail').value = courseEl.textContent.replace(/\s+/g, ' ').trim().substring(0, 40);
+            }
+
+            // 出走馬データ取得
+            const horseRows = doc.querySelectorAll('tr.HorseList, tr[class*="Horse"]');
             state.horses = [];
 
-            for (let i = 1; i <= count; i++) {
-                const horse = {
-                    number: i,
-                    name: `${state.venue.name}ホース${i}`,
-                    jockey: jockeys[Math.floor(Math.random() * jockeys.length)],
-                    weight: (54 + Math.random() * 4).toFixed(1),
-                    odds: (1.5 + Math.random() * 35).toFixed(1),
-                    bodyWeight: String(Math.floor(430 + Math.random() * 70)) + 
-                        '(' + (Math.random() > 0.5 ? '+' : '-') + Math.floor(Math.random() * 8 + 1) + ')'
-                };
-                state.horses.push(horse);
-                appendHorseRow(horse);
+            horseRows.forEach((row, index) => {
+                try {
+                    const horseNameEl = row.querySelector('.HorseName a, a[href*="horse"]');
+                    const jockeyEl = row.querySelector('.Jockey a, a[href*="jockey"]');
+                    const weightEl = row.querySelector('.Jockey, .Weight');
+                    const oddsEl = row.querySelector('.Popular, .Odds');
+
+                    const horseName = horseNameEl?.textContent?.trim();
+                    if (!horseName || horseName.length < 2) return;
+
+                    // 斤量を正規表現で抽出
+                    const weightText = weightEl?.textContent || '';
+                    const weightMatch = weightText.match(/(\d{2}\.\d)/);
+                    const weight = weightMatch ? weightMatch[1] : '55.0';
+
+                    // オッズを数値として抽出
+                    const oddsText = oddsEl?.textContent?.trim() || '0';
+                    const oddsMatch = oddsText.match(/(\d+\.?\d*)/);
+                    const odds = oddsMatch ? parseFloat(oddsMatch[1]) : 0;
+
+                    state.horses.push({
+                        number: index + 1,
+                        name: horseName,
+                        jockey: jockeyEl?.textContent?.trim() || '—',
+                        weight: weight,
+                        odds: odds
+                    });
+                } catch (e) {
+                    console.warn('馬データ解析エラー:', e);
+                }
+            });
+
+            if (state.horses.length === 0) {
+                throw new Error('出馬表データを解析できませんでした');
             }
         }
 
-        function appendHorseRow(horse) {
+        function showResults() {
+            renderHorseTable();
+            document.getElementById('raceDetailCard').classList.remove('hidden');
+            document.getElementById('horseListCard').classList.remove('hidden');
+            document.getElementById('dataStatus').innerHTML = `✅ netkeibaから${state.horses.length}頭の実データを取得しました`;
+            document.getElementById('dataStatus').className = 'info-banner';
+            showToast('✅ 実データを取得しました');
+            setTimeout(() => document.getElementById('horseListCard').scrollIntoView({ behavior: 'smooth' }), 200);
+        }
+
+        function showFallbackMode(errorMsg) {
+            document.getElementById('raceDetailCard').classList.remove('hidden');
+            document.getElementById('horseListCard').classList.remove('hidden');
+            document.getElementById('dataStatus').innerHTML = 
+                `⚠️ 自動取得に失敗しました: ${errorMsg}<br><br>
+                手動入力モードに切り替えます。<a href="https://race.netkeiba.com/top/" target="_blank" style="color:var(--accent-gold);">netkeibaで確認 →</a>`;
+            document.getElementById('dataStatus').className = 'warn-banner';
+            
+            // 空行を追加
+            for (let i = 0; i < 8; i++) addHorseRow();
+            showToast('⚠️ 手動入力モードで起動しました');
+        }
+
+        function renderHorseTable() {
             const tbody = document.getElementById('horseTableBody');
-            const nc = `n${Math.min(horse.number, 8)}`;
+            tbody.innerHTML = '';
+            state.horses.forEach(horse => {
+                const nc = `n${Math.min(horse.number, 8)}`;
+                const oddsColor = horse.odds > 0 ? (horse.odds <= 5 ? 'var(--success)' : 'var(--accent-gold)') : 'var(--text-muted)';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="horse-num ${nc}">${horse.number}</span></td>
+                    <td><input class="form-input" value="${horse.name}" style="min-width:90px;padding:8px;font-size:14px;"></td>
+                    <td><input class="form-input" value="${horse.jockey}" style="min-width:80px;padding:8px;font-size:14px;"></td>
+                    <td><input class="form-input" value="${horse.weight}" style="width:60px;padding:8px;font-size:14px;"></td>
+                    <td><input class="form-input" value="${horse.odds > 0 ? horse.odds : ''}" 
+                        style="width:70px;padding:8px;font-size:14px;color:${oddsColor};font-weight:700;"></td>
+                    <td><button class="btn btn-secondary btn-sm" onclick="removeRow(this)" style="padding:6px;">✕</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ========== UI制御 ==========
+        function toggleManualMode() {
+            const input = document.getElementById('manualUrlInput');
+            input.classList.toggle('hidden');
+            if (!input.classList.contains('hidden')) {
+                document.getElementById('netkeibaUrl').focus();
+            }
+        }
+
+        function addHorseRow() {
+            const tbody = document.getElementById('horseTableBody');
+            const n = tbody.children.length + 1;
+            const nc = `n${Math.min(n, 8)}`;
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><span class="horse-num ${nc}">${horse.number}</span></td>
-                <td><input class="form-input" value="${horse.name}" style="min-width:100px;padding:8px;font-size:14px;"></td>
-                <td><input class="form-input" value="${horse.jockey}" style="min-width:80px;padding:8px;font-size:14px;"></td>
-                <td><input class="form-input" type="number" value="${horse.weight}" step="0.5" style="width:60px;padding:8px;font-size:14px;"></td>
-                <td><input class="form-input" type="number" value="${horse.odds}" step="0.1" style="width:70px;padding:8px;font-size:14px;"></td>
-                <td><input class="form-input" value="${horse.bodyWeight}" style="min-width:80px;padding:8px;font-size:14px;"></td>
-                <td><button class="btn btn-danger btn-sm" onclick="removeRow(this)" style="padding:6px 8px;font-size:12px;">✕</button></td>
+                <td><span class="horse-num ${nc}">${n}</span></td>
+                <td><input class="form-input" placeholder="馬名" style="min-width:90px;padding:8px;font-size:14px;"></td>
+                <td><input class="form-input" placeholder="騎手" style="min-width:80px;padding:8px;font-size:14px;"></td>
+                <td><input class="form-input" placeholder="55.0" style="width:60px;padding:8px;font-size:14px;"></td>
+                <td><input class="form-input" placeholder="オッズ" style="width:70px;padding:8px;font-size:14px;"></td>
+                <td><button class="btn btn-secondary btn-sm" onclick="removeRow(this)" style="padding:6px;">✕</button></td>
             `;
             tbody.appendChild(tr);
         }
 
-        function addHorseRow() {
-            const n = document.getElementById('horseTableBody').children.length + 1;
-            const horse = { number: n, name: '', jockey: '', weight: '55.0', odds: '', bodyWeight: '' };
-            state.horses.push(horse);
-            appendHorseRow(horse);
-        }
-
         function removeRow(btn) {
             btn.closest('tr').remove();
-            updateRowNumbers();
-        }
-
-        function updateRowNumbers() {
-            document.querySelectorAll('#horseTableBody tr').forEach((tr, i) => {
-                const span = tr.querySelector('.horse-num');
-                const n = i + 1;
-                span.textContent = n;
-                span.className = `horse-num n${Math.min(n, 8)}`;
-            });
         }
 
         function clearHorses() {
@@ -1225,275 +737,34 @@
             }
         }
 
-        // ========== Step 2 ==========
         function goToStep2() {
             const rows = document.querySelectorAll('#horseTableBody tr');
             if (rows.length < 2) {
                 showToast('⚠️ 2頭以上入力してください');
                 return;
             }
-            
-            // テーブルから最新データを収集
-            state.horses = [];
-            rows.forEach((tr, i) => {
-                const inputs = tr.querySelectorAll('input');
-                state.horses.push({
-                    number: i + 1,
-                    name: inputs[0].value || `馬${i + 1}`,
-                    jockey: inputs[1].value || '—',
-                    weight: inputs[2].value,
-                    odds: parseFloat(inputs[3].value) || 0,
-                    bodyWeight: inputs[4].value
-                });
-            });
-            
             showStep(2);
         }
 
-        // ========== Step 3 ==========
-        function goToStep3() {
-            const budget = document.getElementById('budget').value;
-            const betType = document.getElementById('betType').value;
-            const strategy = document.getElementById('strategy').value;
-
-            if (!budget || !betType || !strategy) {
-                showToast('⚠️ すべての項目を入力してください');
-                return;
-            }
-
-            state.budget = parseInt(budget);
-            state.betType = betType;
-            state.strategy = strategy;
-
-            buildAnalysis();
-            showStep(3);
+        function hideCards(cardIds) {
+            cardIds.forEach(id => document.getElementById(id).classList.add('hidden'));
         }
 
-        function buildAnalysis() {
-            const list = document.getElementById('analysisHorseList');
-            list.innerHTML = '';
-            state.marks = {};
-            state.comments = {};
-
-            state.horses.forEach(horse => {
-                const nc = `n${Math.min(horse.number, 8)}`;
-                const card = document.createElement('div');
-                card.className = 'analysis-card';
-                card.id = `acard-${horse.number}`;
-
-                card.innerHTML = `
-                    <div class="analysis-header">
-                        <span class="horse-num ${nc}">${horse.number}</span>
-                        <div class="analysis-info">
-                            <div class="analysis-name">${horse.name}</div>
-                            <div class="analysis-meta">${horse.jockey} / 斤量${horse.weight} / ${horse.bodyWeight}</div>
-                        </div>
-                        <div class="analysis-odds">${horse.odds}倍</div>
-                    </div>
-                    <div class="mark-selector">
-                        <div class="mark-btn" onclick="setMark(${horse.number},'honmei',this)">◎</div>
-                        <div class="mark-btn" onclick="setMark(${horse.number},'taikou',this)">○</div>
-                        <div class="mark-btn" onclick="setMark(${horse.number},'ana',this)">☆</div>
-                        <div class="mark-btn" onclick="setMark(${horse.number},'himo',this)">△</div>
-                        <div class="mark-btn" onclick="setMark(${horse.number},'kesi',this)">✕</div>
-                    </div>
-                    <input class="form-input mt-12" placeholder="評価コメント（消し理由など）" 
-                           oninput="setComment(${horse.number}, this.value)" style="font-size:14px;">
-                `;
-
-                list.appendChild(card);
-            });
-        }
-
-        function setMark(num, mark, btn) {
-            // 同一馬のボタン全解除
-            document.querySelectorAll(`#acard-${num} .mark-btn`).forEach(b => {
-                b.classList.remove('active-honmei', 'active-taikou', 'active-ana', 'active-kesi', 'active-himo');
-            });
-
-            if (state.marks[num] === mark) {
-                // 同じ印を再クリック → 解除
-                delete state.marks[num];
-                document.getElementById(`acard-${num}`).className = 'analysis-card';
-            } else {
-                state.marks[num] = mark;
-                btn.classList.add(`active-${mark}`);
-                document.getElementById(`acard-${num}`).className = `analysis-card marked-${mark}`;
-            }
-
-            updateDangerList();
-        }
-
-        function setComment(num, val) {
-            state.comments[num] = val;
-            updateDangerList();
-        }
-
-        function updateDangerList() {
-            const list = document.getElementById('dangerList');
-            const dangers = state.horses.filter(h => 
-                state.marks[h.number] === 'kesi' && h.odds > 0 && h.odds <= 10
-            );
-
-            if (dangers.length === 0) {
-                list.innerHTML = '<div class="text-muted text-center" style="padding:20px;">「消」評価の馬が設定されると表示されます</div>';
-                return;
-            }
-
-            list.innerHTML = dangers.map(h => `
-                <div style="background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.3);border-radius:10px;padding:12px;margin-bottom:8px;">
-                    <div style="color:var(--danger);font-weight:700;font-size:0.9rem;margin-bottom:4px;">
-                        ⚠️ ${h.number}番 ${h.name}（${h.jockey} / ${h.odds}倍）
-                    </div>
-                    <div style="font-size:0.8rem;color:var(--text-secondary);">
-                        ${state.comments[h.number] || '消し理由をコメント欄にご入力ください。'}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function autoGenerateTicket() {
-            const honmei = state.horses.find(h => state.marks[h.number] === 'honmei');
-            if (!honmei) { 
-                showToast('⚠️ ◎本命馬を設定してください'); 
-                return; 
-            }
-
-            const partners = state.horses.filter(h => 
-                ['taikou', 'ana', 'himo'].includes(state.marks[h.number])
-            );
-            
-            const budget = state.budget;
-            const bet = state.betType;
-            const unitBet = budget <= 500 ? 100 : 200;
-            let lines = [];
-
-            if (bet === '単勝' || bet === '複勝') {
-                lines.push(`${bet} ${honmei.number}番 ¥${budget}`);
-            } else {
-                partners.slice(0, 5).forEach(p => {
-                    if (bet === '馬連' || bet === 'ワイド') {
-                        const nums = [honmei.number, p.number].sort((a,b) => a-b);
-                        lines.push(`${bet} ${nums.join('-')} ¥${unitBet}`);
-                    } else {
-                        lines.push(`${bet} ${honmei.number}→${p.number} ¥${unitBet}`);
-                    }
-                });
-            }
-
-            const total = bet === '単勝' || bet === '複勝' ? budget : lines.length * unitBet;
-            document.getElementById('ticketPlan').value = 
-                lines.join('\n') + `\n\n合計: ¥${total.toLocaleString()}`;
-            showToast('✅ 買い目テンプレートを生成しました');
-        }
-
-        function generateComment() {
-            const honmei = state.horses.find(h => state.marks[h.number] === 'honmei');
-            const ana = state.horses.filter(h => state.marks[h.number] === 'ana');
-            
-            const comment = `【${state.venue?.name || '—'} ${state.race} ${document.getElementById('raceName').value}】
-
-◎本命: ${honmei ? `${honmei.number}番 ${honmei.name}（${honmei.odds}倍）` : '未設定'}
-能力・安定感・条件適性の三要素を満たし、最もリスクが低い馬として選定。
-
-${ana.length > 0 ? `☆穴馬: ${ana.map(h => `${h.number}番 ${h.name}（${h.odds}倍）`).join('、')}
-オッズ面で過小評価されているが、条件が向けば上位争いは必至。` : ''}
-
-馬券種: ${state.betType} / 予算: ¥${state.budget.toLocaleString()}
-狙い方: ${state.strategy}
-
-データと論理に基づいた判断を貫き、再現性ある投資を実践する。`;
-
-            document.getElementById('secretaryComment').value = comment;
-            showToast('✅ コメントを生成しました');
-        }
-
-        // ========== Step 4 ==========
-        function calculateResult() {
-            const r1 = parseInt(document.getElementById('result1st').value) || 0;
-            const r2 = parseInt(document.getElementById('result2nd').value) || 0;
-            const r3 = parseInt(document.getElementById('result3rd').value) || 0;
-            const ret = parseInt(document.getElementById('totalReturn').value) || 0;
-
-            if (!r1) { 
-                showToast('⚠️ 1着馬番を入力してください'); 
-                return; 
-            }
-
-            const honmei = state.horses.find(h => state.marks[h.number] === 'honmei');
-            const honmeiHit = honmei && [r1, r2, r3].includes(honmei.number);
-            const roi = state.budget > 0 ? Math.round(ret / state.budget * 100) : 0;
-            const profit = ret - state.budget;
-
-            const grid = document.getElementById('resultGrid');
-            grid.innerHTML = `
-                <div class="result-item" style="grid-column:1/-1;background:${honmeiHit ? 'rgba(39,174,96,0.1)' : 'rgba(231,76,60,0.1)'};border:1px solid ${honmeiHit ? 'var(--success)' : 'var(--danger)'};">
-                    <div class="result-label">本命の結果</div>
-                    <div class="result-value" style="color:${honmeiHit ? 'var(--success)' : 'var(--danger)'};">
-                        ${honmeiHit ? '✅ 的中' : '❌ 不的中'}
-                    </div>
-                </div>
-                <div class="result-item">
-                    <div class="result-label">回収率</div>
-                    <div class="result-value" style="color:${roi >= 100 ? 'var(--success)' : 'var(--danger)'};">${roi}%</div>
-                </div>
-                <div class="result-item">
-                    <div class="result-label">損益</div>
-                    <div class="result-value" style="color:${profit >= 0 ? 'var(--success)' : 'var(--danger)'};">
-                        ${profit >= 0 ? '+' : ''}¥${profit.toLocaleString()}
-                    </div>
-                </div>
-            `;
-
-            const h1 = state.horses.find(h => h.number === r1);
-            const h2 = state.horses.find(h => h.number === r2);
-            const h3 = state.horses.find(h => h.number === r3);
-
-            document.getElementById('resultDetail').innerHTML = `
-                <div style="background:var(--bg-panel);border-radius:10px;padding:14px;margin-top:12px;">
-                    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;">確定着順</div>
-                    <div style="font-size:0.9rem;line-height:1.8;">
-                        🥇 ${r1}番 ${h1?.name || '—'}<br>
-                        🥈 ${r2}番 ${h2?.name || '—'}<br>
-                        🥉 ${r3}番 ${h3?.name || '—'}
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('resultSummary').classList.remove('hidden');
-            setTimeout(() => document.getElementById('resultSummary').scrollIntoView({ behavior: 'smooth' }), 100);
-        }
-
-        function saveReview() {
-            const review = document.getElementById('reviewText').value.trim();
-            if (!review) { 
-                showToast('⚠️ 振り返り内容を入力してください'); 
-                return; 
-            }
-            showToast('💾 振り返りを保存しました');
-        }
-
-        // ========== リセット ==========
         function resetAll() {
-            if (!confirm('すべてのデータをリセットして新しいレースを開始しますか？')) return;
-
-            state = { date: '', venue: null, race: '', horses: [], marks: {}, comments: {}, budget: 0, betType: '', strategy: '' };
-
-            document.querySelectorAll('input, select, textarea').forEach(el => {
+            if (!confirm('すべてのデータをリセットしますか？')) return;
+            
+            state = { date: '', venue: null, race: '', horses: [] };
+            document.querySelectorAll('input, select').forEach(el => {
                 if (el.type === 'date') {
                     const t = new Date();
-                    el.value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
-                } else if (el.type !== 'checkbox' && el.type !== 'radio') {
+                    el.value = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+                } else {
                     el.value = '';
                 }
             });
-
-            ['venueCard', 'raceCard', 'fetchSection', 'raceDetailCard', 'horseListCard', 'resultSummary']
-                .forEach(id => document.getElementById(id).classList.add('hidden'));
-
+            
+            hideCards(['venueCard', 'raceCard', 'fetchCard', 'raceDetailCard', 'horseListCard']);
             document.getElementById('horseTableBody').innerHTML = '';
-            document.getElementById('analysisHorseList').innerHTML = '';
-
             onDateChange();
             showStep(1);
             showToast('🔄 新しいレースを開始します');
@@ -1510,10 +781,10 @@ ${ana.length > 0 ? `☆穴馬: ${ana.map(h => `${h.number}番 ${h.name}（${h.od
         }
 
         function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2800);
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
     </script>
 </body>
